@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS track(id INTEGER PRIMARY KEY, source_id INTEGER NOT N
 CREATE TABLE IF NOT EXISTS item(id TEXT PRIMARY KEY, point_id TEXT NOT NULL REFERENCES point(id), photo_hash TEXT, note TEXT);
 CREATE TABLE IF NOT EXISTS problem(id TEXT PRIMARY KEY, point_id TEXT NOT NULL REFERENCES point(id), state TEXT NOT NULL, evidence TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS issue(id INTEGER PRIMARY KEY, code TEXT NOT NULL, detail TEXT NOT NULL, source_id INTEGER REFERENCES source(id));
-CREATE TABLE IF NOT EXISTS decision(point_id TEXT PRIMARY KEY REFERENCES point(id), result TEXT NOT NULL, position TEXT, evidence TEXT NOT NULL, rules_version TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS run(id TEXT PRIMARY KEY, rules_version TEXT NOT NULL, source_digest TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS evidence(id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES run(id), subject_id TEXT NOT NULL, source_id INTEGER REFERENCES source(id), object_kind TEXT NOT NULL, object_id INTEGER NOT NULL, detail TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS decision(point_id TEXT PRIMARY KEY REFERENCES point(id), result TEXT NOT NULL, position TEXT, evidence TEXT NOT NULL, rules_version TEXT NOT NULL, run_id TEXT NOT NULL REFERENCES run(id));
 """
 def connect(path):
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)

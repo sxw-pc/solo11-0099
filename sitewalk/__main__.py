@@ -14,7 +14,7 @@ def init(db_path):
         con.execute('INSERT OR IGNORE INTO point VALUES (?,?,?,?,?,?,?)',('A','p1',30,120,50,0,1))
     con.close()
 def report(db_path,path):
-    con=connect(db_path);data={name:[dict(r) for r in con.execute('SELECT * FROM '+name)] for name in ('plan','point','source','asset','photo','track','item','problem','issue','decision')}
+    con=connect(db_path);data={name:[dict(r) for r in con.execute('SELECT * FROM '+name)] for name in ('plan','point','source','asset','photo','track','item','problem','run','evidence','issue','decision')}
     for row in data['issue']:row.pop('id',None)
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8');path.with_suffix('.md').write_text('# 巡检覆盖结论\n\n'+'\n'.join(f"- {d['point_id']}: {d['result']}（规则 {d['rules_version']}）" for d in data['decision'])+'\n',encoding='utf-8');con.close();return path
 def demo(folder):

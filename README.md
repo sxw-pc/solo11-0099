@@ -9,3 +9,5 @@
 定位距离使用局部平面近似，适用于小型工区。室内楼层和多终端冲突属于未来边界，不在首版实现。
 
 安装检查：在仓库目录运行 `python -m pip install . --no-build-isolation`；本地开发也可直接运行模块命令。报告同时生成 JSON 和 Markdown，`inspect` 子命令可追踪单个对象。
+
+审计台账：Run 由规则版本和来源摘要确定，Evidence 关联原始对象与来源，Decision 引用 Run；重复核验保持同一输入的报告稳定。

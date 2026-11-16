@@ -1,4 +1,5 @@
 import json
+from hashlib import sha256
 import math
 from datetime import timedelta
 from .ingest import time
@@ -18,6 +19,14 @@ def evaluate(db_path):
         con.execute('DELETE FROM decision');con.execute("DELETE FROM issue WHERE code IN ('reused_photo','missing_item','route_order','insufficient_dwell','track_gap','plan_time','unresolved_problem')")
         track=[dict(r) for r in con.execute('SELECT * FROM track ORDER BY ts,id')]
         photos=[dict(r) for r in con.execute('SELECT * FROM photo ORDER BY ts,id')]
+        source_digest=sha256('|'.join(r['sha256'] for r in con.execute('SELECT sha256 FROM source ORDER BY sha256')).encode()).hexdigest()
+        run_id=sha256(('1:'+source_digest).encode()).hexdigest()
+        con.execute('INSERT OR IGNORE INTO run VALUES (?,?,?)',(run_id,'1',source_digest))
+        for obj_kind,records in [('photo',photos),('track',track)]:
+            for obj in records:
+                subject=obj['point_id'] if obj_kind=='photo' else '__route__'
+                eid=sha256(f"{obj_kind}:{obj['source_id']}:{obj['id']}".encode()).hexdigest()
+                con.execute('INSERT OR REPLACE INTO evidence VALUES (?,?,?,?,?,?,?)',(eid,run_id,subject,obj['source_id'],obj_kind,obj['id'],json.dumps(obj,ensure_ascii=False,sort_keys=True)))
         reused={p['sha256'] for p in photos if len({(r['point_id'],r['ts'][:10]) for r in photos if r['sha256']==p['sha256']})>1}
         for h in reused:con.execute('INSERT INTO issue(code,detail) VALUES (?,?)',('reused_photo',h))
         prev_visit=None
@@ -48,7 +57,7 @@ def evaluate(db_path):
             for code in problems:con.execute('INSERT INTO issue(code,detail) VALUES (?,?)',(code,point['id']))
             result='待复核' if problems else '覆盖'
             evidence=json.dumps({'photos':[p['id'] for p in attached],'issues':problems},ensure_ascii=False)
-            con.execute('INSERT INTO decision VALUES (?,?,?,?,?)',(point['id'],result,json.dumps(coordinates),evidence,'1'));results[point['id']]=result
+            con.execute('INSERT INTO decision VALUES (?,?,?,?,?,?)',(point['id'],result,json.dumps(coordinates),evidence,'1',run_id));results[point['id']]=result
     con.close();return results
 def advance_problem(db_path,problem_id,new_state,evidence):
     allowed={'found':'assigned','assigned':'rechecked','rechecked':'closed'}

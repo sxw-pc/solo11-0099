@@ -89,3 +89,33 @@ def test_markdown_report_exists(tmp_path):
 def test_missing_photo_never_covered(tmp_path):
     db=tmp_path/'x.db';init(db)
     assert evaluate(db)['A']=='待复核'
+
+def test_evidence_and_run_are_persisted(tmp_path):
+    data=json.loads(demo(tmp_path).read_text(encoding='utf-8'))
+    assert data["run"]
+    assert data['evidence']
+    assert all(e['run_id'] for e in data['evidence'])
+
+def test_valid_item_photo_link(tmp_path):
+    db=tmp_path/'x.db';init(db)
+    (tmp_path/'p.txt').write_text('x');f=tmp_path/'p.jsonl';f.write_text(json.dumps({'point_id':'A','ts':'2026-01-01T00:05:00Z','file':'p.txt'}));photos(f,db)
+    h=connect(db).execute('SELECT sha256 FROM photo').fetchone()[0]
+    c=connect(db)
+    with c:c.execute('INSERT INTO item VALUES (?,?,?,?)',('i','A',h,None))
+    evaluate(db)
+    assert c.execute("SELECT count(*) FROM issue WHERE code='missing_item'").fetchone()[0]==0
+def test_route_order_reversal(tmp_path):
+    db=tmp_path/'x.db';init(db);c=connect(db)
+    with c:
+        c.execute('INSERT INTO point VALUES (?,?,?,?,?,?,?)',('B','p1',30,120,50,0,2))
+        c.execute("INSERT INTO source(path,sha256) VALUES ('x','h')")
+        c.execute("INSERT INTO photo(source_id,point_id,ts,sha256,payload) VALUES (1,'A','2026-01-01T00:05:00Z','a','{}')")
+        c.execute("INSERT INTO photo(source_id,point_id,ts,sha256,payload) VALUES (1,'B','2026-01-01T00:04:00Z','b','{}')")
+        c.execute("INSERT INTO track(source_id,ts,lat,lon) VALUES (1,'2026-01-01T00:00:00Z',30,120)")
+        c.execute("INSERT INTO track(source_id,ts,lat,lon) VALUES (1,'2026-01-01T00:10:00Z',30,120)")
+    evaluate(db)
+    assert c.execute("SELECT count(*) FROM issue WHERE code='route_order'").fetchone()[0]==1
+def test_decision_links_run_and_evidence(tmp_path):
+    data=json.loads(demo(tmp_path).read_text(encoding='utf-8'))
+    assert data['decision'][0]['run_id']==data['run'][0]['id']
+    assert data['evidence']
