@@ -68,3 +68,24 @@ def test_demo_repeat_is_deterministic(tmp_path):
     first=demo(tmp_path).read_bytes()
     second=demo(tmp_path).read_bytes()
     assert first==second
+
+def test_interpolation_midpoint():
+    from sitewalk.rules import location
+    from sitewalk.ingest import time
+    track=[{'ts':'2026-01-01T00:00:00Z','lat':30,'lon':120},{'ts':'2026-01-01T00:10:00Z','lat':32,'lon':122}]
+    assert location(track,time('2026-01-01T00:05:00Z'))==(31,121)
+def test_dwell_requirement_marks_uncertain(tmp_path):
+    db=tmp_path/'x.db';init(db);c=connect(db)
+    with c:c.execute("UPDATE point SET min_dwell_s=600 WHERE id='A'")
+    assert evaluate(db)['A']=='待复核'
+def test_photo_asset_is_unique(tmp_path):
+    db=tmp_path/'x.db';init(db)
+    (tmp_path/'p.txt').write_text('x')
+    f=tmp_path/'photos.jsonl';f.write_text('\n'.join(json.dumps({'point_id':'A','ts':f'2026-01-01T00:0{i}:00Z','file':'p.txt'}) for i in (1,2)))
+    assert photos(f,db)==2
+    assert connect(db).execute('SELECT count(*) FROM asset').fetchone()[0]==1
+def test_markdown_report_exists(tmp_path):
+    assert demo(tmp_path).with_suffix('.md').exists()
+def test_missing_photo_never_covered(tmp_path):
+    db=tmp_path/'x.db';init(db)
+    assert evaluate(db)['A']=='待复核'
