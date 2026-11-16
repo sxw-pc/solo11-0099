@@ -63,3 +63,8 @@ def test_plan_load_transaction(tmp_path):
     assert load_plan(p,db)==1
     with pytest.raises(ValueError,match='plan_immutable'):load_plan(p,db)
     assert connect(db).execute('SELECT count(*) FROM point').fetchone()[0]==1
+
+def test_demo_repeat_is_deterministic(tmp_path):
+    first=demo(tmp_path).read_bytes()
+    second=demo(tmp_path).read_bytes()
+    assert first==second

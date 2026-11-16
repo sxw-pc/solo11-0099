@@ -7,3 +7,5 @@
 数据流：Plan → Point；Source → Photo / Track；Point → Item / Problem / Decision。位置用相邻轨迹点线性插值，轨迹缺口超过 10 分钟视为未知；核验规划有效期、点位半径、停留时长、检查项证据、跨点位或跨日期复用照片。问题状态为 found → assigned → rechecked → closed，非法状态转移报错。报告含坐标、照片哈希和未覆盖点位。
 
 定位距离使用局部平面近似，适用于小型工区。室内楼层和多终端冲突属于未来边界，不在首版实现。
+
+安装检查：在仓库目录运行 `python -m pip install . --no-build-isolation`；本地开发也可直接运行模块命令。报告同时生成 JSON 和 Markdown，`inspect` 子命令可追踪单个对象。
