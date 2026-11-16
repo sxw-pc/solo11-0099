@@ -24,6 +24,7 @@ def photos(path,db_path):
                 row=json.loads(line);point=row['point_id'];ts=row['ts'];time(ts)
                 photo=Path(path).parent/row['file'];content_hash=sha(photo.read_bytes())
                 if not con.execute('SELECT 1 FROM point WHERE id=?',(point,)).fetchone():raise ValueError('unknown_point')
+                con.execute('INSERT OR IGNORE INTO asset(sha256,bytes) VALUES (?,?)',(content_hash,photo.stat().st_size))
                 con.execute('INSERT INTO photo(source_id,point_id,ts,sha256,payload) VALUES (?,?,?,?,?)',(sid,point,ts,content_hash,line));count+=1
             except (KeyError,ValueError,OSError,json.JSONDecodeError) as exc:con.execute('INSERT INTO issue(code,detail,source_id) VALUES (?,?,?)',('photo_error',str(exc),sid))
     con.close();return count
@@ -36,7 +37,7 @@ def tracks(path,db_path):
             try:
                 time(row['ts']);lat=float(row['lat']);lon=float(row['lon'])
                 if abs(lat)>90 or abs(lon)>180:raise ValueError('coordinate_range')
-                con.execute('INSERT INTO track(source_id,ts,lat,lon) VALUES (?,?,?,?,)',(sid,row['ts'],lat,lon));count+=1
+                con.execute('INSERT INTO track(source_id,ts,lat,lon) VALUES (?,?,?,?)',(sid,row['ts'],lat,lon));count+=1
             except (KeyError,ValueError) as exc:con.execute('INSERT INTO issue(code,detail,source_id) VALUES (?,?,?)',('track_error',str(exc),sid))
     con.close();return count
 def items(path,db_path):
@@ -49,3 +50,4 @@ def items(path,db_path):
                 con.execute('INSERT INTO item VALUES (?,?,?,?)',(row['id'],row['point_id'],row.get('photo_hash'),row.get('note')));count+=1
             except (KeyError,ValueError) as exc:con.execute('INSERT INTO issue(code,detail,source_id) VALUES (?,?,?)',('item_error',str(exc),sid))
     con.close();return count
+
