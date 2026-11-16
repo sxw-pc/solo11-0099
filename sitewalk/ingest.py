@@ -13,7 +13,8 @@ def source(con,path):
     raw=Path(path).read_bytes();h=sha(raw)
     old=con.execute('SELECT id FROM source WHERE sha256=?',(h,)).fetchone()
     if old:return old['id'],True
-    return con.execute('INSERT INTO source(path,sha256) VALUES (?,?)',(str(path),h)).lastrowid,False
+    batch=con.execute('SELECT id FROM batch ORDER BY id LIMIT 1').fetchone()
+    return con.execute('INSERT INTO source(path,sha256,raw,batch_id) VALUES (?,?,?,?)',(str(path),h,raw,batch['id'] if batch else None)).lastrowid,False
 def photos(path,db_path):
     con=connect(db_path);count=0
     with con:
@@ -24,7 +25,7 @@ def photos(path,db_path):
                 row=json.loads(line);point=row['point_id'];ts=row['ts'];time(ts)
                 photo=Path(path).parent/row['file'];content_hash=sha(photo.read_bytes())
                 if not con.execute('SELECT 1 FROM point WHERE id=?',(point,)).fetchone():raise ValueError('unknown_point')
-                con.execute('INSERT OR IGNORE INTO asset(sha256,bytes) VALUES (?,?)',(content_hash,photo.stat().st_size))
+                con.execute('INSERT OR IGNORE INTO asset(sha256,bytes,raw) VALUES (?,?,?)',(content_hash,photo.stat().st_size,photo.read_bytes()))
                 con.execute('INSERT INTO photo(source_id,point_id,ts,sha256,payload) VALUES (?,?,?,?,?)',(sid,point,ts,content_hash,line));count+=1
             except (KeyError,ValueError,OSError,json.JSONDecodeError) as exc:con.execute('INSERT INTO issue(code,detail,source_id) VALUES (?,?,?)',('photo_error',str(exc),sid))
     con.close();return count

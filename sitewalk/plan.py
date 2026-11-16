@@ -13,6 +13,7 @@ def load_plan(path,db_path):
         old=con.execute('SELECT * FROM plan WHERE id=?',(plan['id'],)).fetchone()
         if old:raise ValueError('plan_immutable')
         con.execute('INSERT INTO plan VALUES (?,?,?,?)',(plan['id'],int(plan['version']),plan['valid_from'],plan['valid_to']))
+        con.execute('INSERT INTO batch VALUES (?,?,?)',(data.get('batch_id',plan['id']+'-batch'),plan['id'],'ready'))
         for point in points:
             if float(point['radius_m'])<=0 or int(point['min_dwell_s'])<0:raise ValueError('invalid_point_rule')
             con.execute('INSERT INTO point VALUES (?,?,?,?,?,?,?)',(point['id'],plan['id'],float(point['lat']),float(point['lon']),float(point['radius_m']),int(point['min_dwell_s']),int(point['order'])))

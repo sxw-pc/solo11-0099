@@ -119,3 +119,20 @@ def test_decision_links_run_and_evidence(tmp_path):
     data=json.loads(demo(tmp_path).read_text(encoding='utf-8'))
     assert data['decision'][0]['run_id']==data['run'][0]['id']
     assert data['evidence']
+
+def test_raw_source_is_retained_after_input_changes(tmp_path):
+    path=demo(tmp_path)
+    before=path.read_bytes()
+    db=tmp_path/"sitewalk.db"
+    con=connect(db)
+    row=con.execute("SELECT path,raw FROM source LIMIT 1").fetchone() if "source"!='source_file' else con.execute('SELECT name AS path,raw FROM source_file LIMIT 1').fetchone()
+    from pathlib import Path
+    preserved=bytes(row['raw'])
+    Path(row['path']).write_bytes(b'changed after import')
+    assert bytes(con.execute("SELECT raw FROM source LIMIT 1").fetchone()[0])==preserved
+    assert before and preserved
+
+def test_batch_links_source_and_plan(tmp_path):
+    data=json.loads(demo(tmp_path).read_text(encoding='utf-8'))
+    assert data['batch'][0]['plan_id']==data['plan'][0]['id']
+    assert all(src['batch_id']==data['batch'][0]['id'] for src in data['source'])
