@@ -23,10 +23,14 @@ def photos(path,db_path):
         for line in Path(path).read_text(encoding='utf-8-sig').splitlines():
             try:
                 row=json.loads(line);point=row['point_id'];ts=row['ts'];time(ts)
+                declared=row.get('plan_version')
+                if declared is not None:
+                    try:declared=int(declared)
+                    except (TypeError,ValueError):raise ValueError('invalid_plan_version')
                 photo=Path(path).parent/row['file'];content_hash=sha(photo.read_bytes())
                 if not con.execute('SELECT 1 FROM point WHERE id=?',(point,)).fetchone():raise ValueError('unknown_point')
                 con.execute('INSERT OR IGNORE INTO asset(sha256,bytes,raw) VALUES (?,?,?)',(content_hash,photo.stat().st_size,photo.read_bytes()))
-                con.execute('INSERT INTO photo(source_id,point_id,ts,sha256,payload) VALUES (?,?,?,?,?)',(sid,point,ts,content_hash,line));count+=1
+                con.execute('INSERT INTO photo(source_id,point_id,ts,sha256,payload,plan_version) VALUES (?,?,?,?,?,?)',(sid,point,ts,content_hash,line,declared));count+=1
             except (KeyError,ValueError,OSError,json.JSONDecodeError) as exc:con.execute('INSERT INTO issue(code,detail,source_id) VALUES (?,?,?)',('photo_error',str(exc),sid))
     con.close();return count
 def tracks(path,db_path):
