@@ -1,0 +1,14 @@
+{
+  "case_id":"zone-A-2026-04-04",
+  "plan_id":"p1",
+  "zone_point":"A",
+  "permit":{"id":"PERMIT-01","starts":"2026-04-04T09:00:00+08:00","expires":"2026-04-04T10:00:00+08:00","single_entry":true,"max_occupancy":1},
+  "authorization_modes":["named_worker","bearer_credential"],
+  "named_worker":"ALICE",
+  "bearer_token_sha256":"77f9bbc4ebea72da1122857a4951402bd5c32329c117506854750de2ee11c442",
+  "presentations":[
+    {"id":"REQ-A","terminal":"G1","actor":"ALICE","at":"2026-04-04T09:05:00+08:00","credential":"named"},
+    {"id":"REQ-B","terminal":"G2","actor":"BOB","at":"2026-04-04T09:05:00+08:00","credential":"bearer","token":"synthetic-bearer-BOB-01"}
+  ],
+  "terminals":[{"id":"G1"},{"id":"G2"}]
+}
