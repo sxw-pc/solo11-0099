@@ -1,0 +1,6 @@
+{
+  "gross":[{"id":"G1","at_minute":0,"compatible_tares":["T1","T2"]},{"id":"G2","at_minute":5,"compatible_tares":["T1"]}],
+  "tares":[{"id":"T1","at_minute":10},{"id":"T2","at_minute":20}],
+  "nearest_first_result":[["G1","T1"]],
+  "complete_matching":[["G1","T2"],["G2","T1"]]
+}

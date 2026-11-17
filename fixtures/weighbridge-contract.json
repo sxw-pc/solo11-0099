@@ -1,0 +1,15 @@
+{
+  "case_id":"bridge-A-2026-04-08",
+  "plan_id":"p1",
+  "site_point":"A",
+  "weight_unit":"kilograms",
+  "reads":[
+    {"id":"G1","kind":"gross","at":"2026-04-08T09:00:00+08:00","kg":14000,"camera_plate":"PLATE-A","rfid_trailer":"TRL-2","ticket":"RAW-G1"},
+    {"id":"G2","kind":"gross","at":"2026-04-08T09:05:00+08:00","kg":13000,"camera_plate":"PLATE-B","rfid_trailer":"TRL-1","ticket":"RAW-G2"},
+    {"id":"T1","kind":"tare","at":"2026-04-08T09:10:00+08:00","kg":5000,"camera_plate":"PLATE-A","rfid_trailer":"TRL-1","ticket":"RAW-T1"},
+    {"id":"T2","kind":"tare","at":"2026-04-08T09:20:00+08:00","kg":6000,"camera_plate":"PLATE-B","rfid_trailer":"TRL-2","ticket":"RAW-T2"}
+  ],
+  "identity_contracts":["camera_plate","rfid_trailer"],
+  "max_cycle_minutes":30,
+  "material_price_cents_per_1000kg":1000
+}
