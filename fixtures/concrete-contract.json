@@ -1,0 +1,14 @@
+{
+  "case_id":"mix-pad-A-2026-04-09",
+  "plan_id":"p1",
+  "site_point":"A",
+  "target":{"dry_aggregate_kg":100,"fine_fraction":0.4,"cement_kg":20,"water_cement_ratio":0.5},
+  "stockpiles":[
+    {"id":"A","fine_fraction_dry":0.2,"available_wet_kg":100,"lab_moisture_fraction_dry":0.1,"probe_moisture_fraction_dry":0.2},
+    {"id":"B","fine_fraction_dry":0.6,"available_wet_kg":100,"lab_moisture_fraction_dry":0,"probe_moisture_fraction_dry":0}
+  ],
+  "water_meter":{"id":"WM1","available_kg":10,"resolution_kg":0.1},
+  "mixer":{"id":"MX1","capacity_wet_kg":200,"journal_supported":true},
+  "moisture_authorities":["lab_dry_basis","inline_probe"],
+  "fault_injection":{"point":"after_water_dose_before_ack","requested_water_kg":5}
+}
