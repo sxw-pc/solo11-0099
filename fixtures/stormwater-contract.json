@@ -1,0 +1,14 @@
+{
+  "case_id":"rain-pad-A-2026-04-10",
+  "plan_id":"p1",
+  "site_point":"A",
+  "slot_minutes":15,
+  "inflow_cubic_metres":[8,8,0,0],
+  "pond":{"id":"P1","initial_cubic_metres":0,"capacity_cubic_metres":10},
+  "gravity_outlet":{"id":"O1","max_cubic_metres_per_slot":4,"downstream_lag_slots":1},
+  "bypass_pump":{"id":"BP1","max_cubic_metres_per_slot":4,"downstream_lag_slots":1},
+  "retention_pump":{"id":"TP1","max_cubic_metres_per_slot":4},
+  "mobile_tank":{"id":"T1","capacity_cubic_metres":4,"tanker_pickup_slot":4},
+  "downstream_limit_cubic_metres_per_slot":8,
+  "operation_contracts":["retain_and_haul","licensed_bypass"]
+}
