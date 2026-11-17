@@ -1,0 +1,19 @@
+{
+  "case_id": "pad-A-2026-04-02",
+  "plan_id": "p1",
+  "anchor_point": "A",
+  "units": "metres",
+  "vertices": [
+    {"id":"SW","x":0,"y":0,"ground_z":0,"design_z":1},
+    {"id":"SE","x":1,"y":0,"ground_z":0,"design_z":1},
+    {"id":"NW","x":0,"y":1,"ground_z":0,"design_z":1},
+    {"id":"NE","x":1,"y":1,"ground_z":4,"design_z":1}
+  ],
+  "cells": [{"id":"pad","corners":["SW","SE","NE","NW"],"status":"accepted"}],
+  "surface_contracts": {
+    "survey_breakline": {"diagonal":["SW","NE"]},
+    "uniform_grid": {"diagonal":["SE","NW"]}
+  },
+  "cut_cents_per_cubic_metre": 12000,
+  "fill_cents_per_cubic_metre": 8000
+}
