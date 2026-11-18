@@ -8,6 +8,7 @@ from .rules import evaluate
 from .store import connect
 from .plan import load_plan
 from .rules import advance_problem
+from . import weighbridge as wb
 def init(db_path):
     con=connect(db_path)
     with con:
@@ -34,6 +35,15 @@ def main():
     r=s.add_parser('report');r.add_argument('--db',required=True);r.add_argument('--out',required=True)
     x=s.add_parser('inspect');x.add_argument('--db',required=True);x.add_argument('--point',required=True)
     m=s.add_parser('problem');m.add_argument('--db',required=True);m.add_argument('--id',required=True);m.add_argument('--state',required=True);m.add_argument('--evidence',required=True);m.add_argument('--point')
+    w=s.add_parser('weigh-register');w.add_argument('--db',required=True);w.add_argument('--contract',required=True)
+    ws=s.add_parser('weigh-settle');ws.add_argument('--db',required=True);ws.add_argument('--case',required=True)
+    wr=s.add_parser('weigh-report');wr.add_argument('--db',required=True);wr.add_argument('--case',required=True);wr.add_argument('--out',required=True)
+    sign=s.add_parser('weigh-sign');sign.add_argument('--db',required=True);sign.add_argument('--ticket',required=True);sign.add_argument('--driver',required=True);sign.add_argument('--consignee',required=True);sign.add_argument('--at',required=True);sign.add_argument('--failed',action='store_true');sign.add_argument('--note',default='')
+    pr=s.add_parser('weigh-print');pr.add_argument('--db',required=True);pr.add_argument('--ticket',required=True);pr.add_argument('--printer',required=True);pr.add_argument('--at',required=True);pr.add_argument('--paper',required=True);pr.add_argument('--reprint-of',default=None)
+    ack=s.add_parser('weigh-ack');ack.add_argument('--db',required=True);ack.add_argument('--job',required=True);ack.add_argument('--at',required=True);ack.add_argument('--scanner',required=True)
+    lost=s.add_parser('weigh-lost');lost.add_argument('--db',required=True);lost.add_argument('--job',required=True);lost.add_argument('--scanner',required=True);lost.add_argument('--note',required=True)
+    paper=s.add_parser('weigh-paper');paper.add_argument('--db',required=True);paper.add_argument('--case',required=True);paper.add_argument('--paper',required=True);paper.add_argument('--at',required=True);paper.add_argument('--scanner',required=True)
+    am=s.add_parser('weigh-amend');am.add_argument('--db',required=True);am.add_argument('--case',required=True);am.add_argument('--amendment',required=True);am.add_argument('--reason',required=True);am.add_argument('--at',required=True);am.add_argument('--reads');am.add_argument('--calibrations')
     args=p.parse_args()
     if args.cmd=='demo':print(demo(args.workdir or tempfile.mkdtemp(prefix='sitewalk-')))
     elif args.cmd=='init':load_plan(args.plan,args.db) if args.plan else init(args.db)
@@ -46,6 +56,18 @@ def main():
             with con:con.execute('INSERT INTO problem VALUES (?,?,?,?)',(args.id,args.point,'found',args.evidence))
             con.close()
         else:advance_problem(args.db,args.id,args.state,args.evidence)
-    else:
+    elif args.cmd=='inspect':
         con=connect(args.db);print(json.dumps({'decision':[dict(r) for r in con.execute('SELECT * FROM decision WHERE point_id=?',(args.point,))],'photos':[dict(r) for r in con.execute('SELECT * FROM photo WHERE point_id=?',(args.point,))]},ensure_ascii=False));con.close()
+    elif args.cmd=='weigh-register':print(wb.register(args.db,args.contract))
+    elif args.cmd=='weigh-settle':print(wb.settle(args.db,args.case))
+    elif args.cmd=='weigh-report':print(wb.report(args.db,args.case,args.out))
+    elif args.cmd=='weigh-sign':print(wb.sign_ticket(args.db,args.ticket,args.driver,args.consignee,args.at,not args.failed,args.note))
+    elif args.cmd=='weigh-print':print(wb.record_print(args.db,args.ticket,args.printer,args.at,args.paper,args.reprint_of))
+    elif args.cmd=='weigh-ack':print(wb.acknowledge_print(args.db,args.job,args.at,args.scanner))
+    elif args.cmd=='weigh-lost':print(wb.mark_print_lost(args.db,args.job,args.scanner,args.note))
+    elif args.cmd=='weigh-paper':print(wb.register_paper_ticket(args.db,args.case,args.paper,args.at,args.scanner))
+    elif args.cmd=='weigh-amend':
+        reads=json.loads(Path(args.reads).read_text(encoding='utf-8')) if args.reads else None
+        cals=json.loads(Path(args.calibrations).read_text(encoding='utf-8')) if args.calibrations else None
+        print(wb.amend(args.db,args.case,args.amendment,args.reason,args.at,reads,cals))
 if __name__=='__main__':main()

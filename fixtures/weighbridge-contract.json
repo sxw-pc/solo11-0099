@@ -1,15 +1,25 @@
 {
-  "case_id":"bridge-A-2026-04-08",
-  "plan_id":"p1",
-  "site_point":"A",
-  "weight_unit":"kilograms",
-  "reads":[
-    {"id":"G1","kind":"gross","at":"2026-04-08T09:00:00+08:00","kg":14000,"camera_plate":"PLATE-A","rfid_trailer":"TRL-2","ticket":"RAW-G1"},
-    {"id":"G2","kind":"gross","at":"2026-04-08T09:05:00+08:00","kg":13000,"camera_plate":"PLATE-B","rfid_trailer":"TRL-1","ticket":"RAW-G2"},
-    {"id":"T1","kind":"tare","at":"2026-04-08T09:10:00+08:00","kg":5000,"camera_plate":"PLATE-A","rfid_trailer":"TRL-1","ticket":"RAW-T1"},
-    {"id":"T2","kind":"tare","at":"2026-04-08T09:20:00+08:00","kg":6000,"camera_plate":"PLATE-B","rfid_trailer":"TRL-2","ticket":"RAW-T2"}
+  "case_id": "bridge-A-2026-04-08",
+  "plan_id": "p1",
+  "site_point": "A",
+  "weight_unit": "kilograms",
+  "confirmed_identity_contract": "camera_plate",
+  "reads": [
+    {"id": "G1", "kind": "gross", "at": "2026-04-08T09:00:00+08:00", "kg": 14000, "camera_plate": "PLATE-A", "camera_confidence": 0.98, "rfid_trailer": "TRL-2", "ticket": "RAW-G1", "scale_id": "WB-1", "calibration_version": "cal-2026Q1-3", "gate": "in", "driver": "司机甲", "consignee": "收货方华北"},
+    {"id": "G2", "kind": "gross", "at": "2026-04-08T09:05:00+08:00", "kg": 13000, "camera_plate": "PLATE-B", "camera_confidence": 0.97, "rfid_trailer": "TRL-1", "ticket": "RAW-G2", "scale_id": "WB-1", "calibration_version": "cal-2026Q1-3", "gate": "in", "driver": "司机乙", "consignee": "收货方华东"},
+    {"id": "T1", "kind": "tare", "at": "2026-04-08T09:10:00+08:00", "kg": 5000, "camera_plate": "PLATE-A", "camera_confidence": 0.96, "rfid_trailer": "TRL-1", "ticket": "RAW-T1", "scale_id": "WB-1", "calibration_version": "cal-2026Q1-3", "gate": "out", "driver": "司机甲", "consignee": "收货方华北"},
+    {"id": "T2", "kind": "tare", "at": "2026-04-08T09:20:00+08:00", "kg": 6000, "camera_plate": "PLATE-B", "camera_confidence": 0.95, "rfid_trailer": "TRL-2", "ticket": "RAW-T2", "scale_id": "WB-1", "calibration_version": "cal-2026Q1-3", "gate": "out", "driver": "司机乙", "consignee": "收货方华东"}
   ],
-  "identity_contracts":["camera_plate","rfid_trailer"],
-  "max_cycle_minutes":30,
-  "material_price_cents_per_1000kg":1000
+  "calibrations": [
+    {"scale_id": "WB-1", "calibration_version": "cal-2026Q1-3", "valid_from": "2026-01-01T00:00:00+08:00", "valid_to": "2026-07-01T00:00:00+08:00", "state": "valid", "evidence_hash": "sha256:cal-2026q1-3-synthetic"}
+  ],
+  "gate_events": [
+    {"read_id": "G1", "direction": "in", "at": "2026-04-08T09:00:00+08:00"},
+    {"read_id": "G2", "direction": "in", "at": "2026-04-08T09:05:00+08:00"},
+    {"read_id": "T1", "direction": "out", "at": "2026-04-08T09:10:00+08:00"},
+    {"read_id": "T2", "direction": "out", "at": "2026-04-08T09:20:00+08:00"}
+  ],
+  "identity_contracts": ["camera_plate", "rfid_trailer"],
+  "max_cycle_minutes": 30,
+  "material_price_cents_per_1000kg": 1000
 }

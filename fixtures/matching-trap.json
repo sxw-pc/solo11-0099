@@ -1,6 +1,18 @@
 {
-  "gross":[{"id":"G1","at_minute":0,"compatible_tares":["T1","T2"]},{"id":"G2","at_minute":5,"compatible_tares":["T1"]}],
-  "tares":[{"id":"T1","at_minute":10},{"id":"T2","at_minute":20}],
-  "nearest_first_result":[["G1","T1"]],
-  "complete_matching":[["G1","T2"],["G2","T1"]]
+  "description": "最近时刻贪心配对反例：G1 先取最近的 T1 后，G2 没有合法皮重；全局完整匹配 G1->T2、G2->T1 可结算两车。",
+  "cap": {"max_gross": 12, "max_tares": 12},
+  "greedy_rule": "nearest_time_first",
+  "window_minutes": 30,
+  "weight_unit": "kilograms",
+  "gross": [
+    {"id": "G1", "at_minute": 0, "kg": 14000, "compatible_tares": ["T1", "T2"]},
+    {"id": "G2", "at_minute": 5, "kg": 13000, "compatible_tares": ["T1"]}
+  ],
+  "tares": [
+    {"id": "T1", "at_minute": 10, "kg": 5000},
+    {"id": "T2", "at_minute": 20, "kg": 6000}
+  ],
+  "feasible_edges": [["G1", "T1"], ["G1", "T2"], ["G2", "T1"]],
+  "nearest_first_result": [["G1", "T1"]],
+  "complete_matching": [["G1", "T2"], ["G2", "T1"]]
 }
